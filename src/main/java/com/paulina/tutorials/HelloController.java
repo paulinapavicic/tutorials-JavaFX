@@ -31,6 +31,8 @@ public class HelloController {
     @FXML private Button saveButton;
     @FXML private Button clearButton;
     @FXML private Button updateButton;
+    @FXML private Button deleteButton;
+
     private Tutorial selectedTutorial = null;
 
     private final TutorialService tutorialService = new TutorialService();
@@ -74,6 +76,7 @@ public class HelloController {
                     } else {
                         selectedTutorial = null;
                         onClearForm();
+                        deleteButton.setDisable(true);
                     }
                 }
         );
@@ -183,5 +186,47 @@ public class HelloController {
             updateButton.setDisable(false);
         }
     }
+
+
+
+    @FXML
+    private void onDeleteClick() {
+        if (selectedTutorial == null) {
+            statusLabel.setText("❌ Select a row first!");
+            return;
+        }
+
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Delete");
+        alert.setHeaderText("Delete Tutorial");
+        alert.setContentText("Are you sure you want to delete:\n\"" +
+                selectedTutorial.getTitle() + "\"?");
+
+        ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
+
+        if (result == ButtonType.OK) {
+            try {
+                deleteButton.setDisable(true);
+                statusLabel.setText("⏳ Deleting...");
+
+                tutorialService.deleteTutorial(selectedTutorial.getId());
+
+
+                tutorialsTable.getItems().remove(selectedTutorial);
+                selectedTutorial = null;
+                onClearForm();
+
+                statusLabel.setText("✅ Record deleted successfully!");
+                deleteButton.setDisable(true);
+
+            } catch (Exception e) {
+                statusLabel.setText("❌ Delete failed: " + e.getMessage());
+            } finally {
+                deleteButton.setDisable(false);
+            }
+        }
+    }
+
 
 }

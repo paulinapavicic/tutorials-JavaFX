@@ -165,6 +165,29 @@ public class TutorialService {
         System.out.println("✅ Updated! Status: " + response.statusCode());
     }
 
+    public void deleteTutorial(Long id) throws Exception {
+        if (id == null) {
+            throw new RuntimeException("Cannot delete: No ID");
+        }
+
+        System.out.println("🗑️ DELETE: " + id);
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/tutorials/" + id))
+                .DELETE()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200 && response.statusCode() != 204) {
+            throw new RuntimeException("Delete failed: HTTP " + response.statusCode());
+        }
+
+        System.out.println("✅ Deleted! Status: " + response.statusCode());
+    }
+
+
 
 
 }
