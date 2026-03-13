@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TutorialService {
-    private final String baseUrl = "http://localhost:8081/api/tutorials";
+    private final String baseUrl = "http://localhost:8080/api/tutorials";
 
     public List<Tutorial> getAllTutorials() {
         try {
@@ -101,6 +101,40 @@ public class TutorialService {
         }
         return false;
     }
+
+    public void saveTutorial(Tutorial tutorial) throws Exception {
+        try {
+            System.out.println("💾 POST: " + tutorial);
+
+
+            String json = String.format(
+                    "{\"title\":\"%s\",\"description\":\"%s\",\"published\":%s}",
+                    tutorial.getTitle().replace("\"", "\\\""),
+                    tutorial.getDescription().replace("\"", "\\\""),
+                    tutorial.isPublished()
+            );
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:8080/api/tutorials"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200 || response.statusCode() == 201) {
+                System.out.println("✅ Saved! Status: " + response.statusCode());
+            } else {
+                throw new RuntimeException("Save failed: " + response.statusCode());
+            }
+
+        } catch (Exception e) {
+            System.out.println("❌ Save error: " + e.getMessage());
+            throw e;
+        }
+    }
+
 
 
 }

@@ -4,11 +4,12 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.Group?>
 <VBox alignment="CENTER_LEFT" spacing="10.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.paulina.tutorials.HelloController">
   <children>
     <HBox alignment="CENTER_LEFT" spacing="10.0">
       <children>
-        <Label text="📚 Tutorials REST API Client" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+        <Label text="Tutorials REST API Client" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
         <Region HBox.hgrow="ALWAYS" />
         <Button fx:id="refreshButton" mnemonicParsing="false" text="🔄 Refresh" onAction="#onRefreshClick" />
       </children>
@@ -16,6 +17,34 @@
         <Insets bottom="10.0" left="20.0" right="20.0" top="20.0" />
       </padding>
     </HBox>
+
+    <Group>
+      <VBox spacing="10.0">
+        <children>
+          <Label text="➕ Create New Tutorial" style="-fx-font-weight: bold;" />
+          <GridPane hgap="10.0" vgap="8.0">
+            <children>
+              <Label text="Title:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+              <TextField fx:id="titleField" promptText="Enter tutorial title" GridPane.columnIndex="1" GridPane.rowIndex="0" GridPane.columnSpan="2" />
+
+              <Label text="Description:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+              <TextField fx:id="descriptionField" promptText="Enter description" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.columnSpan="2" />
+
+              <CheckBox fx:id="publishedCheck" text="Published" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+
+              <Button fx:id="saveButton" text="💾 Save" onAction="#onSaveClick" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.hgrow="NEVER" />
+              <Button fx:id="clearButton" text="🗑️ Clear Form" onAction="#onClearForm" GridPane.columnIndex="2" GridPane.rowIndex="3" GridPane.hgrow="NEVER" />
+            </children>
+            <columnConstraints>
+              <ColumnConstraints hgrow="NEVER" minWidth="80.0" prefWidth="100.0" />
+              <ColumnConstraints hgrow="ALWAYS" />
+              <ColumnConstraints hgrow="NEVER" minWidth="100.0" prefWidth="120.0" />
+            </columnConstraints>
+            <padding><Insets top="10.0" /></padding>
+          </GridPane>
+        </children>
+      </VBox>
+    </Group>
 
     <TableView fx:id="tutorialsTable" VBox.vgrow="ALWAYS">
       <columns>

@@ -5,10 +5,7 @@ import com.paulina.tutorials.services.TutorialService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 
 import java.util.List;
 
@@ -27,6 +24,12 @@ public class HelloController {
     private Button refreshButton;
     @FXML
     private Label statusLabel;
+
+    @FXML private TextField titleField;
+    @FXML private TextField descriptionField;
+    @FXML private CheckBox publishedCheck;
+    @FXML private Button saveButton;
+    @FXML private Button clearButton;
 
     private final TutorialService tutorialService = new TutorialService();
 
@@ -87,6 +90,44 @@ public class HelloController {
         } finally {
             refreshButton.setDisable(false);
         }
+    }
+
+    @FXML
+    private void onSaveClick() {
+
+        if (titleField.getText().trim().isEmpty()) {
+            statusLabel.setText("❌ Title is required!");
+            return;
+        }
+
+
+        Tutorial newTutorial = new Tutorial(null,
+                titleField.getText().trim(),
+                descriptionField.getText().trim(),
+                publishedCheck.isSelected());
+
+        try {
+            saveButton.setDisable(true);
+            statusLabel.setText("⏳ Saving...");
+
+            tutorialService.saveTutorial(newTutorial);
+            refreshTutorials();
+            statusLabel.setText("✅ Record saved successfully!");
+            onClearForm();
+
+        } catch (Exception e) {
+            statusLabel.setText("❌ Save failed: " + e.getMessage());
+        } finally {
+            saveButton.setDisable(false);
+        }
+    }
+
+    @FXML
+    private void onClearForm() {
+        titleField.clear();
+        descriptionField.clear();
+        publishedCheck.setSelected(false);
+        statusLabel.setText("👆 Fill form and click Save!");
     }
 
 }
