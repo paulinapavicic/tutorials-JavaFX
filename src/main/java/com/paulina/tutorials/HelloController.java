@@ -30,6 +30,8 @@ public class HelloController {
     @FXML private CheckBox publishedCheck;
     @FXML private Button saveButton;
     @FXML private Button clearButton;
+    @FXML private Button updateButton;
+    private Tutorial selectedTutorial = null;
 
     private final TutorialService tutorialService = new TutorialService();
 
@@ -63,9 +65,28 @@ public class HelloController {
             return new javafx.beans.property.SimpleBooleanProperty(tutorial.isPublished());
         });
 
+        tutorialsTable.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
+                    if (newSelection != null) {
+                        selectedTutorial = newSelection;
+                        populateEditForm(newSelection);
+                        statusLabel.setText("✏️ Edit: " + newSelection.getTitle());
+                    } else {
+                        selectedTutorial = null;
+                        onClearForm();
+                    }
+                }
+        );
+
 
         refreshTutorials();
 
+    }
+
+    private void populateEditForm(Tutorial tutorial) {
+        titleField.setText(tutorial.getTitle());
+        descriptionField.setText(tutorial.getDescription());
+        publishedCheck.setSelected(tutorial.isPublished());
     }
 
 
@@ -128,6 +149,39 @@ public class HelloController {
         descriptionField.clear();
         publishedCheck.setSelected(false);
         statusLabel.setText("👆 Fill form and click Save!");
+    }
+
+    @FXML
+    private void onUpdateClick() {
+        if (selectedTutorial == null) {
+            statusLabel.setText("❌ Select a row first!");
+            return;
+        }
+
+        if (titleField.getText().trim().isEmpty()) {
+            statusLabel.setText("❌ Title is required!");
+            return;
+        }
+
+
+        selectedTutorial.setTitle(titleField.getText().trim());
+        selectedTutorial.setDescription(descriptionField.getText().trim());
+        selectedTutorial.setPublished(publishedCheck.isSelected());
+
+        try {
+            updateButton.setDisable(true);
+            statusLabel.setText("⏳ Updating...");
+
+            tutorialService.updateTutorial(selectedTutorial);
+            refreshTutorials();
+            statusLabel.setText("✅ Record updated successfully!");
+            onClearForm();
+
+        } catch (Exception e) {
+            statusLabel.setText("❌ Update failed: " + e.getMessage());
+        } finally {
+            updateButton.setDisable(false);
+        }
     }
 
 }

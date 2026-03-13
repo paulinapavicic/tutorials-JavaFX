@@ -135,6 +135,36 @@ public class TutorialService {
         }
     }
 
+    public void updateTutorial(Tutorial tutorial) throws Exception {
+        if (tutorial.getId() == null) {
+            throw new RuntimeException("Cannot update: No ID");
+        }
+
+        System.out.println("🔄 PUT: " + tutorial.getId());
+
+        String json = String.format(
+                "{\"title\":\"%s\",\"description\":\"%s\",\"published\":%s}",
+                tutorial.getTitle().replace("\"", "\\\""),
+                tutorial.getDescription().replace("\"", "\\\""),
+                tutorial.isPublished()
+        );
+
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:8080/api/tutorials/" + tutorial.getId()))
+                .header("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(json))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            throw new RuntimeException("Update failed: HTTP " + response.statusCode());
+        }
+
+        System.out.println("✅ Updated! Status: " + response.statusCode());
+    }
+
 
 
 }
