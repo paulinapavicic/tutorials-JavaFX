@@ -74,9 +74,8 @@ public class HelloController {
                         populateEditForm(newSelection);
                         statusLabel.setText("✏️ Edit: " + newSelection.getTitle());
                     } else {
-                        selectedTutorial = null;
                         onClearForm();
-                        deleteButton.setDisable(true);
+                        statusLabel.setText("👆 Select row to edit");
                     }
                 }
         );
@@ -222,8 +221,6 @@ public class HelloController {
 
             } catch (Exception e) {
                 statusLabel.setText("❌ Delete failed: " + e.getMessage());
-            } finally {
-                deleteButton.setDisable(false);
             }
         }
     }
