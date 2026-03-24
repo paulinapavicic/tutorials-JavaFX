@@ -1,6 +1,8 @@
 package com.paulina.tutorials;
 
+import com.paulina.tutorials.models.Book;
 import com.paulina.tutorials.models.Tutorial;
+import com.paulina.tutorials.services.BookService;
 import com.paulina.tutorials.services.TutorialService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -33,10 +35,23 @@ public class HelloController {
     @FXML private Button updateButton;
     @FXML private Button deleteButton;
 
+
+    @FXML private TableView<Book> booksTable;
+    @FXML private TableColumn<Book, Long> booksIdColumn;
+    @FXML private TableColumn<Book, String> booksTitleColumn;
+    @FXML private TableColumn<Book, String> booksAuthorColumn;
+    @FXML private TableColumn<Book, String> booksIsbnColumn;
+    @FXML private TableColumn<Book, Boolean> booksAvailableColumn;
+    @FXML private TextField booksTitleField, booksAuthorField, booksIsbnField;
+    @FXML private CheckBox booksAvailableCheck;
+    @FXML private Button booksRefreshButton, booksSaveButton, booksUpdateButton, booksDeleteButton, booksClearButton;
+    @FXML private Label booksStatusLabel;
+
+
     private Tutorial selectedTutorial = null;
 
     private final TutorialService tutorialService = new TutorialService();
-
+    private final BookService bookService = new BookService();
     @FXML
     public void initialize() {
 
@@ -79,7 +94,36 @@ public class HelloController {
                     }
                 }
         );
+        booksIdColumn.setCellValueFactory(cell -> {
+            Book book = cell.getValue();
+            return book == null || book.getId() == null ?
+                    new javafx.beans.property.SimpleLongProperty(0L).asObject() :
+                    new javafx.beans.property.SimpleLongProperty(book.getId()).asObject();
+        });
 
+        booksTitleColumn.setCellValueFactory(cell -> {
+            Book book = cell.getValue();
+            return book == null ? null :
+                    new javafx.beans.property.SimpleStringProperty(book.getTitle());
+        });
+
+        booksAuthorColumn.setCellValueFactory(cell -> {
+            Book book = cell.getValue();
+            return book == null ? null :
+                    new javafx.beans.property.SimpleStringProperty(book.getAuthor());
+        });
+
+        booksIsbnColumn.setCellValueFactory(cell -> {
+            Book book = cell.getValue();
+            return book == null ? null :
+                    new javafx.beans.property.SimpleStringProperty(book.getIsbn());
+        });
+
+        booksAvailableColumn.setCellValueFactory(cell -> {
+            Book book = cell.getValue();
+            return book == null ? null :
+                    new javafx.beans.property.SimpleBooleanProperty(book.isAvailable());
+        });
 
         refreshTutorials();
 
@@ -223,6 +267,88 @@ public class HelloController {
                 statusLabel.setText("❌ Delete failed: " + e.getMessage());
             }
         }
+    }
+
+
+    @FXML
+    void onBooksRefreshClick() {
+        List<Book> books = bookService.getAllBooks();
+        booksTable.setItems(FXCollections.observableArrayList(books));
+        booksStatusLabel.setText("✅ Loaded " + books.size() + " books");
+    }
+
+    @FXML
+    void onBooksSaveClick() {
+        try {
+            Book newBook = new Book(
+                    booksTitleField.getText(),
+                    booksAuthorField.getText(),
+                    booksIsbnField.getText(),
+                    booksAvailableCheck.isSelected()
+            );
+
+            bookService.saveBook(newBook);
+            onBooksRefreshClick(); // Reload list
+            clearBooksForm();
+            booksStatusLabel.setText("✅ New book saved!");
+        } catch (Exception e) {
+            booksStatusLabel.setText("❌ Save failed: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    void onBooksUpdateClick() {
+        Book selected = booksTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            booksStatusLabel.setText("👆 Select a book first");
+            return;
+        }
+
+        try {
+            selected.setTitle(booksTitleField.getText());
+            selected.setAuthor(booksAuthorField.getText());
+            selected.setIsbn(booksIsbnField.getText());
+            selected.setAvailable(booksAvailableCheck.isSelected());
+
+            bookService.updateBook(selected);
+            onBooksRefreshClick(); // Reload list
+            booksStatusLabel.setText("✅ Book updated!");
+        } catch (Exception e) {
+            booksStatusLabel.setText("❌ Update failed: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    void onBooksDeleteClick() {
+        Book selected = booksTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            booksStatusLabel.setText("👆 Select a book first");
+            return;
+        }
+
+        try {
+            bookService.deleteBook(selected.getId());
+            onBooksRefreshClick(); // Reload list
+            clearBooksForm();
+            booksStatusLabel.setText("✅ Book deleted!");
+        } catch (Exception e) {
+            booksStatusLabel.setText("❌ Delete failed: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    void onBooksClearForm() {
+        clearBooksForm();
+        booksTable.getSelectionModel().clearSelection();
+        booksStatusLabel.setText("📝 Form cleared");
+    }
+
+    // Helper method
+    private void clearBooksForm() {
+        booksTitleField.clear();
+        booksAuthorField.clear();
+        booksIsbnField.clear();
+        booksAvailableCheck.setSelected(false);
     }
 
 
