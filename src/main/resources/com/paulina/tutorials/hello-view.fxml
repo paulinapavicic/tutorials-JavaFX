@@ -8,7 +8,6 @@
     <Tab text="📚 Tutorials">
       <content>
         <VBox spacing="15.0">
-          <!-- Header -->
           <HBox alignment="CENTER_LEFT" spacing="15.0" VBox.vgrow="NEVER">
             <children>
               <Label text="Tutorials REST API Client" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />
@@ -62,7 +61,6 @@
     <Tab text="📖 Books">
       <content>
         <VBox spacing="15.0">
-          <!-- Header -->
           <HBox alignment="CENTER_LEFT" spacing="15.0" VBox.vgrow="NEVER">
             <children>
               <Label text="📖 Books REST API Client" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" />

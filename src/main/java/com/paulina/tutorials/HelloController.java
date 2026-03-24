@@ -124,6 +124,20 @@ public class HelloController {
             return book == null ? null :
                     new javafx.beans.property.SimpleBooleanProperty(book.isAvailable());
         });
+        booksTable.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldSelection, newSelection) -> {
+                    if (newSelection != null) {
+                        booksTitleField.setText(newSelection.getTitle());
+                        booksAuthorField.setText(newSelection.getAuthor() != null ? newSelection.getAuthor() : "");
+                        booksIsbnField.setText(newSelection.getIsbn() != null ? newSelection.getIsbn() : "");
+                        booksAvailableCheck.setSelected(newSelection.isAvailable());
+                        booksStatusLabel.setText("✏️ Edit: " + newSelection.getTitle());
+                    } else {
+                        clearBooksForm();
+                        booksStatusLabel.setText("👆 Select row to edit");
+                    }
+                }
+        );
 
         refreshTutorials();
 
@@ -288,7 +302,7 @@ public class HelloController {
             );
 
             bookService.saveBook(newBook);
-            onBooksRefreshClick(); // Reload list
+            onBooksRefreshClick();
             clearBooksForm();
             booksStatusLabel.setText("✅ New book saved!");
         } catch (Exception e) {
@@ -311,7 +325,7 @@ public class HelloController {
             selected.setAvailable(booksAvailableCheck.isSelected());
 
             bookService.updateBook(selected);
-            onBooksRefreshClick(); // Reload list
+            onBooksRefreshClick();
             booksStatusLabel.setText("✅ Book updated!");
         } catch (Exception e) {
             booksStatusLabel.setText("❌ Update failed: " + e.getMessage());
@@ -328,7 +342,7 @@ public class HelloController {
 
         try {
             bookService.deleteBook(selected.getId());
-            onBooksRefreshClick(); // Reload list
+            onBooksRefreshClick();
             clearBooksForm();
             booksStatusLabel.setText("✅ Book deleted!");
         } catch (Exception e) {
@@ -343,7 +357,7 @@ public class HelloController {
         booksStatusLabel.setText("📝 Form cleared");
     }
 
-    // Helper method
+
     private void clearBooksForm() {
         booksTitleField.clear();
         booksAuthorField.clear();
